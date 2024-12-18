@@ -91,7 +91,7 @@ void day_choose()
     time(&current_time);
     tblock = localtime(&current_time);
     time_judge();
-    int input;//Ñ¡ÔñÊ±¼ä
+    int input;//é€‰æ‹©æ—¶é—´
     int time_choice;
     int room_size;
     int class;
@@ -412,13 +412,13 @@ void time_judge(void){
 }
 
 void today_judge(void){
-    //½øÐÐÅÐ¶Ï,ÅÐ¶Ï½ñÌìÒÑ¾­¼¸µãÁË
-    //9-5µã
+    //è¿›è¡Œåˆ¤æ–­,åˆ¤æ–­ä»Šå¤©å·²ç»å‡ ç‚¹äº†
+    //9-5ç‚¹
     struct tm *tblock;
     time_t current_time;
     time(&current_time);
     tblock = localtime(&current_time);
-    //´´½¨ÎÄ¼þ²¢Ð´Èë
+    //åˆ›å»ºæ–‡ä»¶å¹¶å†™å…¥
     FILE *fp;
     fp = fopen("time.txt", "w");
     if (fp == NULL)
@@ -426,7 +426,7 @@ void today_judge(void){
         printf("Error opening file!\n");
         return;
     }
-    if (tblock -> tm_hour < 9 && tblock -> tm_hour > 0)//ÔçÉÏ0 - 9£¬Êä³öÒ»ÕûÌìµÄÊ±¼ä±í
+    if (tblock -> tm_hour < 9 && tblock -> tm_hour > 0)//æ—©ä¸Š0 - 9ï¼Œè¾“å‡ºä¸€æ•´å¤©çš„æ—¶é—´è¡¨
     {
         for (int i = 9; i <= 17; i++)
         {
@@ -438,14 +438,14 @@ void today_judge(void){
             }else if (i > 12 && i < 17)
             {
                 int i1;
-                i1 = abs(i - 12);//×ª»»µ½12Ð¡Ê±ÖÆ
+                i1 = abs(i - 12);//è½¬æ¢åˆ°12å°æ—¶åˆ¶
                 printf("%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
                 fprintf(fp, "%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
             }
             numn = num;
         }
         printf("%d. quit\n", numn);
-    }else if (tblock -> tm_hour >= 9 && tblock -> tm_hour < 12)//9 - 12Ö®¼ä
+    }else if (tblock -> tm_hour >= 9 && tblock -> tm_hour < 12)//9 - 12ä¹‹é—´
     {
         int num = 1;
         for (int i = tblock -> tm_hour; i <= 17; i++)
@@ -458,7 +458,7 @@ void today_judge(void){
             }else if (flag > 12 && flag < 17)
             {
                 int i1;
-                i1 = abs(i - 12);//×ª»»µ½12Ð¡Ê±ÖÆ
+                i1 = abs(i - 12);//è½¬æ¢åˆ°12å°æ—¶åˆ¶
                 printf("%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
                 fprintf(fp, "%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
             }
@@ -480,7 +480,7 @@ void today_judge(void){
             }else if (flag > 12 && flag < 17)
             {
                 int i1;
-                i1 = abs(i - 12);//×ª»»µ½12Ð¡Ê±ÖÆ
+                i1 = abs(i - 12);//è½¬æ¢åˆ°12å°æ—¶åˆ¶
                 printf("%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
                 fprintf(fp, "%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
             }
@@ -488,7 +488,7 @@ void today_judge(void){
             num++;
         }
         printf("%d. quit\n", numn);
-    }else if (tblock -> tm_hour > 12 && tblock -> tm_hour < 17)//12 - 17Ö®¼ä
+    }else if (tblock -> tm_hour > 12 && tblock -> tm_hour < 17)//12 - 17ä¹‹é—´
     {
         int num = 1;
         for (int i = tblock -> tm_hour; i <= 17; i++)
@@ -499,7 +499,7 @@ void today_judge(void){
                 if (flag > 12 && flag <= 17)
                 {
                     int i1;
-                    i1 = abs(flag - 12);//×ª»»µ½12Ð¡Ê±ÖÆ
+                    i1 = abs(flag - 12);//è½¬æ¢åˆ°12å°æ—¶åˆ¶
                     if (i1 >= 5)
                     {
                         numn = num;
@@ -515,7 +515,7 @@ void today_judge(void){
             num++;
         }
         printf("%d. quit\n", numn);
-    }else if(tblock -> tm_hour >= 17 && tblock -> tm_hour < 24)//½ñÌì½áÊøÁË
+    }else if(tblock -> tm_hour >= 17 && tblock -> tm_hour < 24)//ä»Šå¤©ç»“æŸäº†
     {
         printf("There are no classrooms available today!\n");
     }
@@ -604,11 +604,6 @@ void room_output(int room_size, int total_room, char *time, int day) {
     char line[100];
     int num = 1;
     FILE *output_file = fopen("classroom.txt", "w");
-    if (output_file == NULL) {
-        printf("Error: Cannot open output file!\n");
-        return;
-    }
-
     for (int i = 0; i < total_room; i++) {
         char filename[15];
         sprintf(filename, "C%d.txt", i + 1);
@@ -622,7 +617,7 @@ void room_output(int room_size, int total_room, char *time, int day) {
             }
         }
         int today_flag = 0, found_flag = 0;
-        while (fgets(line, sizeof(line), fp) != NULL) {//¼ìË÷¶ÔÓ¦Ä£¿é
+        while (fgets(line, sizeof(line), fp) != NULL) {//æ£€ç´¢å¯¹åº”æ¨¡å—
             line[strcspn(line, "\n")] = '\0';
             if (strcmp(line, "Today") == 0) {
                 today_flag = 1;
@@ -650,7 +645,7 @@ void room_output(int room_size, int total_room, char *time, int day) {
     fclose(output_file);
 }
 
-void book(int class, char *time_flag, int day) {//Ö±½ÓÌæ»»ÐÂÎÄ¼þhhh
+void book(int class, char *time_flag, int day) {//ç›´æŽ¥æ›¿æ¢æ–°æ–‡ä»¶hhh
     char filename[20];
     char filename_ss[20];
     FILE *file = fopen("classroom.txt", "r");
