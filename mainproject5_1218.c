@@ -36,7 +36,7 @@ void room_judge(int input);
 void day_choose(void);
 void refresh(void);
 void init(void);
-void room_output(int room_size, int total_room, char *time);
+void room_output(int room_size, int total_room, char *time, int day);
 void book(int class, char *time_flag, int day);
 int main()
 {
@@ -117,7 +117,7 @@ void day_choose()
                     room_judge(time_choice);
                     printf("Please input room size: ");
                     scanf("%d", &room_size);
-                    room_output(room_size, num_class, time_flag);
+                    room_output(room_size, num_class, time_flag, input);
                     printf("Please input the number of the classroom you want to book: ");
                     scanf("%d", &class);
                     book(class, time_flag, input);
@@ -134,7 +134,7 @@ void day_choose()
                 room_judge(time_choice);
                 printf("Please input room size: ");
                 scanf("%d", &room_size);
-                room_output(room_size, num_class, time_flag);
+                room_output(room_size, num_class, time_flag, input);
                 printf("Please input the number of the classroom you want to book: ");
                 scanf("%d", &class);
                 book(class, time_flag, input);
@@ -150,7 +150,7 @@ void day_choose()
                 room_judge(time_choice);
                 printf("Please input room size: ");
                 scanf("%d", &room_size);
-                room_output(room_size, num_class, time_flag);
+                room_output(room_size, num_class, time_flag, input);
                 printf("Please input the number of the classroom you want to book: ");
                 scanf("%d", &class);
                 book(class, time_flag, input);
@@ -599,8 +599,8 @@ void room_judge(int input) {
     return;
 }
 
-void room_output(int room_size, int total_room, char *time) {
-    FILE *fp[total_room];
+void room_output(int room_size, int total_room, char *time, int day) {
+    FILE *fp;//加入对today那些的判断
     char line[100];
     char classroom_size[20];
     sprintf(classroom_size, "%d", room_size);
@@ -609,28 +609,89 @@ void room_output(int room_size, int total_room, char *time) {
     for (int i = 0; i < total_room; i++) {
         char filename[15];
         sprintf(filename, "C%d.txt", i + 1);
-        fp[i] = fopen(filename, "r");
-        if (fp[i]!= NULL) {
-            if (fgets(line, sizeof(line), fp[i])!= NULL) {
+        fp = fopen(filename, "r");
+        if (fp!= NULL) {
+            if (fgets(line, sizeof(line), fp)!= NULL) {
                 line[strcspn(line, "\n")] = '\0';
-                int file_room_size = atoi(line);
+                int file_room_size = atoi(line);//判断教师大小
                 if (file_room_size >= room_size) {
-                    int found_flag = 0;
-                    while (fgets(line, sizeof(line), fp[i])!= NULL) {
-                        line[strcspn(line, "\n")] = '\0';
-                        if (strstr(line, time)!= NULL && strstr(line, "no") == NULL) {
-                            found_flag = 1;
-                            break;
+                    //判断Today，Tomorrow，The day after Tomorrow，按照day变量来决定从哪开始读取
+                    if (day == 1)
+                    {
+                        int found_flag = 0;
+                        while (fgets(line, sizeof(line), fp)!= NULL)
+                        {
+                            line[strcspn(line, "\n")] = '\0';
+                            if (strstr(line, time)!= NULL && strstr(line, "no") == NULL) {
+                                found_flag = 1;
+                            }
+                            if (strstr(line, "Tomorrow") != NULL)
+                            {
+                                found_flag = 1;
+                                break;
+                            }   
                         }
-                    }
-                    if (found_flag) {
-                        printf("%d. C%d\n", num, i + 1);
-                        fprintf(output_file, "%d. C%d\n", num, i + 1);
-                        num++;
+                        if (found_flag) {
+                            printf("%d. C%d\n", num, i + 1);
+                            fprintf(output_file, "%d. C%d\n", num, i + 1);
+                            num++;
+                        }
+                    }else if (day == 2)
+                    {
+                        int found_flag = 0;
+                        int day_flag = 0;
+                        while (fgets(line, sizeof(line), fp)!= NULL)
+                        {
+                            if (strstr(line, "Tomorrow") != NULL)
+                            {
+                                day_flag = 1;
+                            }else if (strstr(line, "The day after Tomorrow")!= NULL)
+                            {
+                                day_flag = 0;
+                                break;
+                            }
+                            if (day_flag == 1)
+                            {
+                                line[strcspn(line, "\n")] = '\0';
+                                if (strstr(line, time)!= NULL && strstr(line, "no") == NULL) {
+                                    found_flag = 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (found_flag) {
+                            printf("%d. C%d\n", num, i + 1);
+                            fprintf(output_file, "%d. C%d\n", num, i + 1);
+                            num++;
+                        }
+                    }else if (day == 3)
+                    {
+                        int found_flag = 0;
+                        int day_flag = 0;
+                        while (fgets(line, sizeof(line), fp)!= NULL)
+                        {
+                            if (strstr(line, "The day after Tomorrow") != NULL)
+                            {
+                                day_flag = 1;
+                            }
+                            if (day_flag == 1)
+                            {
+                                line[strcspn(line, "\n")] = '\0';
+                                if (strstr(line, time)!= NULL && strstr(line, "no") == NULL) {
+                                    found_flag = 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (found_flag) {
+                            printf("%d. C%d\n", num, i + 1);
+                            fprintf(output_file, "%d. C%d\n", num, i + 1);
+                            num++;
+                        }
                     }
                 }
             }
-            fclose(fp[i]);
+            fclose(fp);
         }
     }
 
