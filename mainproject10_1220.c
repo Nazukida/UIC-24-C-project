@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 char time_flag[50];
+char user[50];
 int num_class = 0;
 int numn;
 struct t
@@ -109,7 +110,7 @@ void day_choose()
     time(&current_time);
     tblock = localtime(&current_time);
     time_judge();
-    int input; // 选择时间
+    int input; // choose time
     int time_choice;
     int room_size;
     int class;
@@ -554,6 +555,7 @@ bool login_hide()
             continue;
         else
         {
+            strcpy(user, name_j);
             for (int i = 0; i < 100; i++)
             {
                 int flag = 0;
@@ -721,13 +723,10 @@ void time_judge(void)
 
 void today_judge(void)
 {
-    // 进行判断,判断今天已经几点了
-    // 9-5点
     struct tm *tblock;
     time_t current_time;
     time(&current_time);
     tblock = localtime(&current_time);
-    // 创建文件并写入
     FILE *fp;
     fp = fopen("time.txt", "w");
     if (fp == NULL)
@@ -735,7 +734,7 @@ void today_judge(void)
         printf("Error opening file!\n");
         return;
     }
-    if (tblock->tm_hour < 9 && tblock->tm_hour > 0) // 早上0 - 9，输出一整天的时间表
+    if (tblock->tm_hour < 9 && tblock->tm_hour > 0)
     {
         printf("        *                                                                              *                         \n");
         printf("       ***                                                                            ***                        \n");
@@ -753,7 +752,7 @@ void today_judge(void)
             else if (i > 12 && i < 17)
             {
                 int i1;
-                i1 = abs(i - 12); // 转换到12小时制
+                i1 = abs(i - 12); // 12hour
                 printf("                                     %d. %d:00 pm - %d:50 pm\n", num, i1, i1);
                 fprintf(fp, "%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
             }
@@ -767,7 +766,7 @@ void today_judge(void)
         printf("        *                                                                              *                         \n");
         printf("==============================================================================================\n");
     }
-    else if (tblock->tm_hour >= 9 && tblock->tm_hour < 12) // 9 - 12之间
+    else if (tblock->tm_hour >= 9 && tblock->tm_hour < 12) // 9 - 12
     {
         printf("        *                                                                              *                         \n");
         printf("       ***                                                                            ***                        \n");
@@ -786,7 +785,7 @@ void today_judge(void)
             else if (flag > 12 && flag < 17)
             {
                 int i1;
-                i1 = abs(i - 12); // 转换到12小时制
+                i1 = abs(i - 12);
                 printf("                                     %d. %d:00 pm - %d:50 pm\n", num, i1, i1);
                 fprintf(fp, "%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
             }
@@ -820,7 +819,7 @@ void today_judge(void)
             else if (flag > 12 && flag < 17)
             {
                 int i1;
-                i1 = abs(i - 12); // 转换到12小时制
+                i1 = abs(i - 12); 
                 printf("                                     %d. %d:00 pm - %d:50 pm\n", num, i1, i1);
                 fprintf(fp, "%d. %d:00 pm - %d:50 pm\n", num, i1, i1);
             }
@@ -837,7 +836,7 @@ void today_judge(void)
         printf("        *                                                                              *                         \n");
         printf("==============================================================================================\n");
     }
-    else if (tblock->tm_hour > 12 && tblock->tm_hour < 17) // 12 - 17之间
+    else if (tblock->tm_hour > 12 && tblock->tm_hour < 17) // 12 - 17
     {
         printf("        *                                                                              *                         \n");
         printf("       ***                                                                            ***                        \n");
@@ -853,7 +852,7 @@ void today_judge(void)
                 if (flag > 12 && flag <= 17)
                 {
                     int i1;
-                    i1 = abs(flag - 12); // 转换到12小时制
+                    i1 = abs(flag - 12); 
                     if (i1 >= 5)
                     {
                         numn = num;
@@ -875,7 +874,7 @@ void today_judge(void)
         printf("        *                                                                              *                         \n");
         printf("==============================================================================================\n");
     }
-    else if (tblock->tm_hour >= 17 && tblock->tm_hour < 24) // 今天结束了
+    else if (tblock->tm_hour >= 17 && tblock->tm_hour < 24) 
     {
         printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         printf("===================================================================================================\n");
@@ -1016,21 +1015,21 @@ void room_output(int room_size, int total_room, char *time, int day)
         sprintf(filename, "C%d.txt", i + 1);
         fp = fopen(filename, "r");
         if (fgets(line, sizeof(line), fp) != NULL)
-        { // 逐行读取
+        { 
             line[strcspn(line, "\n")] = '\0';
             int file_room_size = atoi(line);
             if (file_room_size < room_size)
-            { // 确定大小
+            { 
                 fclose(fp);
                 continue;
             }
         }
         int today_flag = 0, found_flag = 0;
         while (fgets(line, sizeof(line), fp) != NULL)
-        { // 检索对应模块
+        { 
             line[strcspn(line, "\n")] = '\0';
             if (strcmp(line, "Today") == 0)
-            { // 进行检查
+            { 
                 today_flag = 1;
                 continue;
             }
@@ -1065,7 +1064,7 @@ void room_output(int room_size, int total_room, char *time, int day)
 }
 
 void book(int class, char *time_flag, int day)
-{ // 直接替换新文件hhh
+{ // hhh
     char filename[20];
     char filename_ss[20];
     FILE *file = fopen("classroom.txt", "r");
@@ -1112,7 +1111,8 @@ void book(int class, char *time_flag, int day)
         if (current_day == day && strstr(file_line, time_flag) != NULL && strstr(file_line, "|: yes") != NULL)
         {
             char *flag = strstr(file_line, "|: yes");
-            strcpy(flag, "|: no");
+            strcpy(flag, "|: no ");
+            strcat(flag, user);
             modify_flag = 1;
         }
 
@@ -1122,7 +1122,7 @@ void book(int class, char *time_flag, int day)
     fclose(fp);
     fclose(temp_fp);
     remove(filename);
-    rename("temp.txt", filename); // 被替换的文件
+    rename("temp.txt", filename); // changed
 }
 
 void fail(void)
